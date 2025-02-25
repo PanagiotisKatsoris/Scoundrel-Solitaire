@@ -37,8 +37,10 @@
 		<Unit filename="include/Card.h" />
 		<Unit filename="include/CardAndDeckEnums.h" />
 		<Unit filename="include/Deck.h" />
+		<Unit filename="include/Game.h" />
 		<Unit filename="src/Card.cpp" />
 		<Unit filename="src/Deck.cpp" />
+		<Unit filename="src/Game.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

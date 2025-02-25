@@ -7,6 +7,7 @@ enum Suit
             DIAMONDS,
             HEARTS,
             SPADES,
+            NULLSUIT,
         };
 enum Rank
         {
@@ -23,6 +24,7 @@ enum Rank
             JACK,
             QUEEN,
             KING,
+            NULLRANK,
         };
 
 #endif // CARDANDDECKENUMS_H_INCLUDED

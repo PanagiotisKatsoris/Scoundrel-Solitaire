@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1740487006 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\card.cpp
+1740521445 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\card.cpp
 	"Card.h"
 	"CardAndDeckEnums.h"
 	<iostream>
@@ -10,14 +10,15 @@
 	<string>
 	"CardAndDeckEnums.h"
 
-1740486495 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\cardanddeckenums.h
+1740525229 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\cardanddeckenums.h
 
-1740490093 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\deck.cpp
+1740519511 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\deck.cpp
 	"Deck.h"
 	"CardAndDeckEnums.h"
 	"Card.h"
 	<iostream>
 	<string>
+	<time.h>
 
 1740487211 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\deck.h
 	<iostream>
@@ -28,6 +29,23 @@
 1740490660 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\main.cpp
 	<iostream>
 	<string>
+	"Card.h"
+	"Deck.h"
+	"CardAndDeckEnums.h"
+
+1740523493 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\game.cpp
+	"Game.h"
+	<iostream>
+	<string>
+	<time.h>
+	"Card.h"
+	"Deck.h"
+	"CardAndDeckEnums.h"
+
+1740523454 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\game.h
+	<iostream>
+	<string>
+	<time.h>
 	"Card.h"
 	"Deck.h"
 	"CardAndDeckEnums.h"

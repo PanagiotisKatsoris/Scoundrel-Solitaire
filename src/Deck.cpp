@@ -3,6 +3,7 @@
 #include "Card.h"
 #include <iostream>
 #include <string>
+#include <time.h>
 
 Deck::Deck()
 {
@@ -34,4 +35,13 @@ void Deck::PrintDeck()
             std::cout<<"------------------------"<<std::endl;
         }
     }
+}
+
+Card Deck::DrawCard()
+{
+    srand(time(NULL));
+    int seed = rand()%52525252;
+    srand(seed);
+    int randcard = rand()%51;
+    return deckarr[randcard];
 }
