@@ -1,0 +1,34 @@
+# depslib dependency file v1.0
+1740487006 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\card.cpp
+	"Card.h"
+	"CardAndDeckEnums.h"
+	<iostream>
+	<string>
+
+1740516828 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\card.h
+	<iostream>
+	<string>
+	"CardAndDeckEnums.h"
+
+1740486495 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\cardanddeckenums.h
+
+1740490093 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\deck.cpp
+	"Deck.h"
+	"CardAndDeckEnums.h"
+	"Card.h"
+	<iostream>
+	<string>
+
+1740487211 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\deck.h
+	<iostream>
+	<string>
+	"CardAndDeckEnums.h"
+	"Card.h"
+
+1740490660 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\main.cpp
+	<iostream>
+	<string>
+	"Card.h"
+	"Deck.h"
+	"CardAndDeckEnums.h"
+
