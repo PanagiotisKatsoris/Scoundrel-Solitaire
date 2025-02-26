@@ -14,8 +14,12 @@ this current build only creates a deck of 52 cards and it runs a simple test to 
 int main()
 {
     Game play;
-    play.PrintGameDeck();
-    play.PrintRoom();
+    Deck myDeck;
+    Card temp;
+    temp.PrintCard();
+    temp = myDeck.DrawCard();
+    temp.PrintCard();
+
 
     return 0;
 }

@@ -45,3 +45,47 @@ void Game::PrintRoom()
         room[i].PrintCard();
     }
 }
+
+void Game::SetWeapHeld(bool tf)
+{
+    weapHeld = tf;
+}
+
+void Game::ChangeWeapon(Card w)
+{
+    weapon.SetRank(w.GetRank());
+    weapon.SetSuit(w.GetSuit());
+}
+
+void Game::SetHp(short s)
+{
+    short checkhp = hp + s;
+    if (checkhp < 0)
+    {
+        hp = 0;
+    }
+    else if (checkhp > 20)
+    {
+        hp = 20;
+    }
+    else
+    {
+        hp = checkhp;
+    }
+}
+
+void Game::DealRoom()
+{
+    for (int i = 0; i<4; i++)
+    {
+        switch((room[i]).GetSuit())
+        {
+        case 4:
+            Card temp = deck.DrawCard();
+            room[i]=temp;
+            break;
+        default:
+
+        }
+    }
+}

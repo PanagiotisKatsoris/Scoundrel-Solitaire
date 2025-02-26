@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1740521445 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\card.cpp
+1740525352 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\card.cpp
 	"Card.h"
 	"CardAndDeckEnums.h"
 	<iostream>
@@ -33,7 +33,7 @@
 	"Deck.h"
 	"CardAndDeckEnums.h"
 
-1740523493 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\game.cpp
+1740578882 source:c:\users\rageq\documents\c++programs\scoundrel-solitaire\src\game.cpp
 	"Game.h"
 	<iostream>
 	<string>
@@ -42,7 +42,7 @@
 	"Deck.h"
 	"CardAndDeckEnums.h"
 
-1740523454 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\game.h
+1740578938 c:\users\rageq\documents\c++programs\scoundrel-solitaire\include\game.h
 	<iostream>
 	<string>
 	<time.h>
