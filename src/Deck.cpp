@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <time.h>
+#include <vector>
 
 Deck::Deck()
 {
@@ -40,8 +41,22 @@ void Deck::PrintDeck()
 Card Deck::DrawCard()
 {
     srand(time(NULL));
-    int seed = rand()%52525252;
+    unsigned long seed = rand()%52525252;
     srand(seed);
     int randcard = rand()%51;
+    if (!cardsdrawn.empty())
+    {
+        for (const int& i : cardsdrawn)
+        {
+            if (cardsdrawn.at(i)==randcard)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        cardsdrawn.push_back(randcard);
+    }
     return deckarr[randcard];
 }

@@ -6,6 +6,7 @@
 #include "Card.h"
 #include "Deck.h"
 #include "CardAndDeckEnums.h"
+#include <vector>
 
 
 class Game
@@ -23,6 +24,7 @@ class Game
         Card GetWeapon();//returns weapon
         void PrintRoom();//prints room of four cards
         void DealRoom();//deals new cards in each spot of room if that spot has the empty card. currently cards are infinitely duplicates
+        void DealSpot(int i);//deals new card in a spot of room
     protected:
 
     private:
@@ -31,7 +33,7 @@ class Game
         bool weapHeld;
         Card weapon;
         Card room[4];
-        Card cardsdrawn[];
+        std::vector<Card> cardsdrawn;
 };
 
 #endif // GAME_H

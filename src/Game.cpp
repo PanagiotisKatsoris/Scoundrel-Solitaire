@@ -74,18 +74,27 @@ void Game::SetHp(short s)
     }
 }
 
-void Game::DealRoom()
+
+void Game::DealSpot(int i)
 {
-    for (int i = 0; i<4; i++)
-    {
-        switch((room[i]).GetSuit())
+       switch((room[i]).GetSuit())
         {
         case 4:
             Card temp = deck.DrawCard();
             room[i]=temp;
             break;
         default:
+            break;
+        }
+}
 
+void Game::DealRoom()
+{
+    for (int i = 0; i<4; i++)
+    {
+        while(cardsdrawn.size() < 52)
+        {
+            DealSpot(i);
         }
     }
 }
