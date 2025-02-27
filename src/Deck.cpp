@@ -46,13 +46,24 @@ Card Deck::DrawCard()
     int randcard = rand()%51;
     if (!cardsdrawn.empty())
     {
-        for (const int& i : cardsdrawn)
+        bool dupe = true;
+        do
         {
-            if (cardsdrawn.at(i)==randcard)
-            {
-                break;
-            }
+          for (const int& i : cardsdrawn)
+          {
+              if(cardsdrawn.at(i)==randcard)
+              {
+                  randcard = rand()%51;
+                  break;
+              }
+              else if (i==(cardsdrawn.size()-1))
+              {
+                  dupe = false;
+                  break;
+              }
+          }
         }
+        while (dupe);
     }
     else
     {
