@@ -2,9 +2,9 @@
 #include "CardAndDeckEnums.h"
 #include "Card.h"
 #include <iostream>
-#include <string>
 #include <time.h>
-#include <vector>
+#include <unordered_set>
+#include <climits>
 
 Deck::Deck()
 {
@@ -41,33 +41,18 @@ void Deck::PrintDeck()
 Card Deck::DrawCard()
 {
     srand(time(NULL));
-    unsigned long seed = rand()%52525252;
+    unsigned long seed = rand()%ULONG_MAX;
     srand(seed);
     int randcard = rand()%51;
-    if (!cardsdrawn.empty())
+    while (cardsdrawn.find(randcard) != cardsdrawn.end())
     {
-        bool dupe = true;
-        do
-        {
-          for (const int& i : cardsdrawn)
-          {
-              if(cardsdrawn.at(i)==randcard)
-              {
-                  randcard = rand()%51;
-                  break;
-              }
-              else if (i==(cardsdrawn.size()-1))
-              {
-                  dupe = false;
-                  break;
-              }
-          }
-        }
-        while (dupe);
+        randcard = rand()%51;
     }
-    else
-    {
-        cardsdrawn.push_back(randcard);
-    }
+    cardsdrawn.insert(randcard);
     return deckarr[randcard];
+}
+
+void Deck::ResetDeck()
+{
+    cardsdrawn.clear();
 }

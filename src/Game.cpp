@@ -46,13 +46,12 @@ void Game::PrintRoom()
     }
 }
 
-void Game::SetWeapHeld(bool tf)
-{
-    weapHeld = tf;
-}
-
 void Game::ChangeWeapon(Card w)
 {
+    if(!weapHeld)
+    {
+        weapHeld = true;
+    }
     weapon.SetRank(w.GetRank());
     weapon.SetSuit(w.GetSuit());
 }
@@ -92,7 +91,7 @@ void Game::DealRoom()
 {
     for (int i = 0; i<4; i++)
     {
-        while(cardsdrawn.size() < 52)
+        while(cardsdrawn.size() < 52)//IMPORTANT ***************************************************** i deleted this counter, i need to add it back ************************
         {
             DealSpot(i);
         }
