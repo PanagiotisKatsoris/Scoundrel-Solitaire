@@ -10,7 +10,7 @@ Game::Game()
 {
     hp = 20;
     weapHeld = false;
-
+    numofcards = 0;
 }
 
 Game::~Game()
@@ -81,8 +81,7 @@ void Game::DealSpot(int i)
         case 4:
             Card temp = deck.DrawCard();
             room[i]=temp;
-            break;
-        default:
+            numofcards++;
             break;
         }
 }
@@ -91,9 +90,23 @@ void Game::DealRoom()
 {
     for (int i = 0; i<4; i++)
     {
-        while(cardsdrawn.size() < 52)//IMPORTANT ***************************************************** i deleted this counter, i need to add it back ************************
+        if(numofcards < 52)
         {
             DealSpot(i);
         }
+    }
+}
+
+void Game::ActSpot(short sp)
+{
+    Card nullcard;
+    room[sp] = nullcard;
+}
+
+void Game::EmptyRoom()
+{
+    for (short i = 0; i<4; i++)
+    {
+        ActSpot(i);
     }
 }

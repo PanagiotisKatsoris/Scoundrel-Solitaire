@@ -16,18 +16,30 @@ TODO
 documentation
 
 
-very later stage to RUN FRoM ROOM.
+very later stage to RUN FRoM ROOM. this will be Teleport away and
+will use a second deck that stores rooms which have been teleported
+away from and starts being dealt after the initial deck is empty
 */
 
 int main()
 {
     Game play;
-    Deck myDeck;
-    Card temp;
-    temp.PrintCard();
-    temp = myDeck.DrawCard();
-    temp.PrintCard();
-
-
+    play.DealRoom();
+    play.PrintRoom();
+    std::cout<<"ey yo u got "<<play.GetHp()<<" hp and weapon slot is currently "<<(play.GetWeapon()).CardToString()<<std::endl;
+    play.EmptyRoom();
+    play.DealRoom();
+    play.PrintRoom();
+    for(int i = 0; i<10; i++)
+    {
+        play.EmptyRoom();
+        play.DealRoom();
+    }
+    play.PrintRoom();
+    play.EmptyRoom();
+    play.PrintRoom();
+    play.PrintRoom();
+    play.DealRoom();
+    play.PrintRoom();
     return 0;
 }

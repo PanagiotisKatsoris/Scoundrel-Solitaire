@@ -2,6 +2,7 @@
 #define CARD_H
 #include <iostream>
 #include "CardAndDeckEnums.h"
+#include <string>
 
 
 class Card
@@ -19,6 +20,8 @@ class Card
         Suit GetSuit() const;
         //prints card in "Rank of Suit" format if its a card or "Empty" if its a null card
         void PrintCard();
+        //returns a string in format "Rank of Suit" of the card or "Empty" if card is null
+        std::string CardToString();
 
     protected:
 
