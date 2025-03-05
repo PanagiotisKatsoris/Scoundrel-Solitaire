@@ -68,6 +68,7 @@ class Game
         void RemoveDiamonds();
         void RemoveHearts();
         Card GetSpot(int spt);
+        void PrintStats();
 
     protected:
 

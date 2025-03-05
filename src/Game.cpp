@@ -172,3 +172,17 @@ Card Game::GetSpot(int spt)
 {
     return room[spt];
 }
+
+void Game::PrintStats()
+{
+    std::string tempweaponcheck = weapon.CardToString();
+    std::cout<<"You have "<<GetHp()<<" health points.\nYour weapon slot is: "<<tempweaponcheck<<std::endl;
+    if(weapHeld && !weapKills.empty())
+    {
+        int wpklltemp = *weapKills.begin();
+        std::cout<<"The last monster you killed with this weapon had "<<wpklltemp<<" power."<<std::endl;
+    } else if(weapHeld && weapKills.empty())
+    {
+        std::cout<<"You have not killed any monsters with this weapon yet."<<std::endl;
+    }
+}
