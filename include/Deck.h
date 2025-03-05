@@ -9,14 +9,18 @@
 class Deck
 {
     public:
-        //constructs a standard deck of 52 playing cards
+        /*
+        default constructor constructs a standard deck of 52 playing cards
+        destructor destructs it
+        PrintDeck() prints in sequence all cards of the deck
+        DrawCard() has a default function to draw a random card from the deck and return it also removing it from the pool of cards able to be drawn, or takes an argument and does the same for a specific card
+        ResetDeck() resets the number of cards drawn to 0
+        */
         Deck();
         virtual ~Deck();
-        //iterates through the array and prints every single card. this is used to check if the constructor worked properly
         void PrintDeck();
-        //returns a random card from the deck and also checks if that card has been drawn before to avoid duplicate draws
         Card DrawCard();
-        //resets the unordered set which is used to check which cards have been drawn essentially allowing the DrawCard() method to draw any card again
+        Card DrawCard(int specific);
         void ResetDeck();
     protected:
 
@@ -25,6 +29,7 @@ class Deck
         Card deckarr[52];
         //set of numbers holding the position in the deckarr array of each card that is being drawn with the DrawCard() method which is used to avoid duplicate draws
         std::unordered_set<int> cardsdrawn;
+        Card null;
 };
 
 #endif // DECK_H

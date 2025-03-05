@@ -50,7 +50,7 @@
 	"Deck.h"
 	"CardAndDeckEnums.h"
 
-1740952138 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\main.cpp
+1741133067 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\main.cpp
 	<iostream>
 	<string>
 	<time.h>
@@ -58,6 +58,7 @@
 	"Deck.h"
 	"CardAndDeckEnums.h"
 	"Game.h"
+	<cstdlib>
 
 1740951399 c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\include\card.h
 	<iostream>
@@ -66,19 +67,20 @@
 
 1740736969 c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\include\cardanddeckenums.h
 
-1740741680 c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\include\deck.h
+1741131354 c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\include\deck.h
 	<iostream>
 	<unordered_set>
 	"CardAndDeckEnums.h"
 	"Card.h"
 
-1740951702 c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\include\game.h
+1741132917 c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\include\game.h
 	<iostream>
 	<time.h>
 	"Card.h"
 	"Deck.h"
 	"CardAndDeckEnums.h"
 	<vector>
+	<set>
 
 1740951343 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\src\card.cpp
 	"Card.h"
@@ -86,7 +88,7 @@
 	<iostream>
 	<string>
 
-1740741734 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\src\deck.cpp
+1741131397 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\src\deck.cpp
 	"Deck.h"
 	"CardAndDeckEnums.h"
 	"Card.h"
@@ -95,7 +97,7 @@
 	<unordered_set>
 	<climits>
 
-1740952055 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\src\game.cpp
+1741131467 source:c:\users\aekfc\onedrive\documents\c++programs\scoundrel-solitaire\src\game.cpp
 	"Game.h"
 	<iostream>
 	<string>
@@ -103,4 +105,5 @@
 	"Card.h"
 	"Deck.h"
 	"CardAndDeckEnums.h"
+	<set>
 

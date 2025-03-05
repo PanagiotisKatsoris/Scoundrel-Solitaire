@@ -40,16 +40,33 @@ void Deck::PrintDeck()
 
 Card Deck::DrawCard()
 {
+    if (cardsdrawn.size()>=52)
+        {
+            return Card(NULLRANK, NULLSUIT);
+        }
     srand(time(NULL));
     unsigned long seed = rand()%ULONG_MAX;
     srand(seed);
-    int randcard = rand()%51;
+    int randcard = rand()%52;
     while (cardsdrawn.find(randcard) != cardsdrawn.end())
     {
-        randcard = rand()%51;
+        randcard = rand()%52;
     }
     cardsdrawn.insert(randcard);
     return deckarr[randcard];
+}
+
+Card Deck::DrawCard(int specific)
+{
+    if (cardsdrawn.size()>=52)
+    {
+        return null;
+    } else if(cardsdrawn.find(specific) != cardsdrawn.end())
+    {
+        return null;
+    }
+    cardsdrawn.insert(specific);
+    return deckarr[specific];
 }
 
 void Deck::ResetDeck()

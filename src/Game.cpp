@@ -5,6 +5,7 @@
 #include "Card.h"
 #include "Deck.h"
 #include "CardAndDeckEnums.h"
+#include <set>
 
 Game::Game()
 {
@@ -40,10 +41,12 @@ Card Game::GetWeapon()
 
 void Game::PrintRoom()
 {
+    std::cout<<"-----------------------------------"<<std::endl;
     for (int i = 0; i<4; i++)
     {
         room[i].PrintCard();
     }
+    std::cout<<"-----------------------------------"<<std::endl;
 }
 
 void Game::ChangeWeapon(Card w)
@@ -54,6 +57,7 @@ void Game::ChangeWeapon(Card w)
     }
     weapon.SetRank(w.GetRank());
     weapon.SetSuit(w.GetSuit());
+    weapKills.clear();
 }
 
 void Game::SetHp(short s)
@@ -94,12 +98,15 @@ void Game::DealRoom()
         {
             DealSpot(i);
         }
+        else
+        {
+            break;
+        }
     }
 }
 
-void Game::ActSpot(short sp)
+void Game::EmptySpot(short sp)
 {
-    Card nullcard;
     room[sp] = nullcard;
 }
 
@@ -107,6 +114,61 @@ void Game::EmptyRoom()
 {
     for (short i = 0; i<4; i++)
     {
-        ActSpot(i);
+        EmptySpot(i);
     }
+}
+
+void Game::AddKill(short kill)
+{
+    weapKills.insert(kill);
+}
+//this returns 0 if set is empty. use this in the logic part to print a message maybe
+short Game::GetLastKill()
+{
+    if(!weapKills.empty())
+    {
+        short killstemp = *weapKills.begin();
+        return killstemp;
+    }else
+    {
+        return 0;
+    }
+}
+
+void Game::RemoveKill(short blsm)
+{
+    while(blsm >0)
+    {
+        weapKills.erase(weapKills.begin());
+        blsm--;
+    }
+}
+
+void Game::RemoveDiamonds()
+{
+    Card dump;
+    dump = deck.DrawCard(13);
+    numofcards++;
+    for(int di = 23; di < 26; di++)
+    {
+        dump = deck.DrawCard(di);
+        numofcards++;
+    }
+}
+
+void Game::RemoveHearts()
+{
+    Card dump;
+    dump = deck.DrawCard(26);
+    numofcards++;
+    for(int hi = 36; hi < 39; hi++)
+    {
+        dump = deck.DrawCard(hi);
+        numofcards++;
+    }
+}
+
+Card Game::GetSpot(int spt)
+{
+    return room[spt];
 }
