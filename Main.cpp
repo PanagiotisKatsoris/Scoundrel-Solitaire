@@ -37,7 +37,7 @@ will use a second deck that stores rooms which have been teleported
 away from and starts being dealt after the initial deck is empty
 */
 //--------------BELOW THIS LINE IS THE DECLARATION OF FUNCTIONS--------------------
-void clearScreen()//i did not declare and then define this one i know.
+void clearScreen()// this is used for cleaner approach with the game. clears terminal clutter.
 {
     #ifdef _WIN32
         system("cls"); //if in Windows
@@ -45,13 +45,23 @@ void clearScreen()//i did not declare and then define this one i know.
         system("clear");//if in Linux or macOS
     #endif
 }
-//this is a test function to see how it works
-void testit(Game play);
+/*
+
+OpenState is the default idle state of the game. when called prints room, stats and waits for input.
+NewState is used to clear a room after an action then proceed to OpenState.
+*/
+
+void OpenState(Game& play);
+void NewState(Game& play, short clearroom);
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
 int main()
 {
     Game play;
-    testit(play);
+    OpenState(play);
+    play.EmptyRoom();
+    play.PrintRoom();
+    OpenState(play);
+    NewState(play, 3);
 
 
     return 0;
@@ -59,9 +69,34 @@ int main()
 /*   BELOW THIS LINE ARE THE DEFINITIONS OF FUNCTIONS
 -------------------------------------------------------------*/
 
-void testit(Game play)
+
+void OpenState(Game& play)
 {
-    play.PrintGameDeck();
+    clearScreen();
+    int nullcounter = 0;
+    for (int roomcounter = 0; roomcounter <4; roomcounter++)
+    {
+        switch((play.GetSpot(roomcounter)).GetSuit())
+        {
+        case 4:
+            nullcounter++;
+            break;
+        }
+    }
+    if(nullcounter>=3)
+    {
+        play.DealRoom();
+    }
+    play.PrintRoom();
+    play.PrintStats();
+    std::cout<<"(Type h to see all controls)\nWhat will you do? ";
+}
+
+void NewState(Game& play, short clearroom)
+{
+    short realspot = (clearroom - 1);
+    play.EmptySpot(realspot);
+    OpenState(play);
 }
 // --------- BELOW THIS LINE ARE THE CONTROLS-------------------
 /*
