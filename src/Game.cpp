@@ -186,3 +186,7 @@ void Game::PrintStats()
         std::cout<<"You have not killed any monsters with this weapon yet."<<std::endl;
     }
 }
+bool Game::KillsExist()
+{
+    return !weapKills.empty();
+}

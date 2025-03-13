@@ -69,6 +69,7 @@ class Game
         void RemoveHearts();
         Card GetSpot(int spt);
         void PrintStats();
+        bool KillsExist();
 
     protected:
 
