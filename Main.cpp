@@ -6,6 +6,7 @@
 #include "CardAndDeckEnums.h"
 #include "Game.h"
 #include <cstdlib>
+#include <set>
 
 /*
 version 0.3
@@ -36,9 +37,18 @@ will use a second deck that stores rooms which have been teleported
 away from and starts being dealt after the initial deck is empty
 */
 //--------------BELOW THIS LINE IS THE DECLARATION OF VARIABLES--------------------
+/*
+progress counts how many monsters are slain and when it reaches 26 with hp>0 it gives victory screen
+realspot is a short that converts the input of a spot chosen in room during picking card phase into the internal number of the real position
+weaponvalue stores the value of held weapon for easier access
+cinput stores the input of the player which is a char
+acceptedanswers is a set that holds the accepted values of input
+*/
 int progress;
 short realspot;
-short weaponvalue;
+short weaponvalue = 0;
+char cinput;
+std::unordered_set<char> acceptedanswers = {1, 2, 3, 4, y, c, h, t, g, s, q};
 //--------------BELOW THIS LINE IS THE DECLARATION OF FUNCTIONS--------------------
 void clearScreen()// this is used for cleaner approach with the game. clears terminal clutter.
 {
@@ -53,6 +63,7 @@ void clearScreen()// this is used for cleaner approach with the game. clears ter
 OpenState is the default idle state of the game. when called prints room, stats and waits for input.
 NewState is used to clear a room after an action then proceed to OpenState.
 */
+void Quit(Game& play);
 
 void OpenState(Game& play);
 void NewState(Game& play, short clearroom);
@@ -83,7 +94,10 @@ int main()
 }
 /*   BELOW THIS LINE ARE THE DEFINITIONS OF FUNCTIONS
 -------------------------------------------------------------*/
-
+void Quit(Game& play)
+{
+    play.SetHp(-20);
+}
 
 void OpenState(Game& play)
 {
@@ -143,6 +157,7 @@ void WeaponFight(Game& play, short value)
     }
     std::cout<<"You fight the monster with your weapon. You take "<<-diff<<" points of damage and slay the monster. The monster curses your weapon.\n";
     play.SetHp(diff);
+    play.AddKill(-value);
     play.PrintStats();
     std::cout<<"\nPress Enter to continue...";
     std::cin.ignore();
@@ -153,11 +168,68 @@ void Fight(Game& play, Card cc)
     short value = -MonVal(cc.GetRank());
     if (play.CheckWeapHeld() && play.KillsExist())
     {
-
+        short lastkill = play.GetLastKill();
+        short comparekill = lastkill + value;
+        if (comparekill>0)
+        {
+        std::cout<<"Fight using your weapon. Enter f to use your fists instead ";
+        std::cin.get()>>cinput;
+        switch (cinput)
+            {
+            case f:
+                FistFight(play, value);
+                break;
+            case q:
+                Quit(play);
+                break;
+            case c:
+                OpenState(play);
+                break;
+            default:
+                WeaponFight(play, value);
+                break;
+            }
+        }
+        else
+        {
+            std::cout<<"The last monster you have slain cursed your sword with its value of "<<lastkill<<". You can not use this weapon to fight a monster with an equal or higher value than that. \nEnter f to use your fists instead or c to cancel and go back ";
+            std::cin.get()>>cinput;
+            switch (cinput)
+            {
+            case f:
+                FistFight(play, value);
+                break;
+            case q:
+                Quit(play);
+                break;
+            case c:
+                OpenState(play);
+                break;
+            default:
+                OpenState(play);
+                break;
+            }
+        }
     }
     else if (play.CheckWeapHeld() && !play.KillsExist())
     {
-        std::cout<<"Fight this monster with your weapon?  Enter c to use your fists instead ";//-------------continue here plz
+        std::cout<<"Fight using your weapon. Enter f to use your fists instead ";
+        std::cin.get()>>cinput;
+        switch (cinput)
+        {
+        case f:
+            FistFight(play, value);
+            break;
+        case q:
+            //calls the quit method
+            break;
+        case c:
+            OpenState(play);
+            break;
+        default:
+            WeaponFight(play, value);
+            break;
+        }
     }
     else
     {
