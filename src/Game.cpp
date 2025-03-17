@@ -139,8 +139,16 @@ void Game::RemoveKill(short blsm)
 {
     while(blsm >0)
     {
-        weapKills.erase(weapKills.begin());
-        blsm--;
+        if (!weapKills.empty())
+        {
+            weapKills.erase(weapKills.begin());
+            blsm--;
+        }
+        else
+        {
+            blsm--;
+        }
+
     }
 }
 

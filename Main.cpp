@@ -7,7 +7,9 @@
 #include "Game.h"
 #include <cstdlib>
 #include <set>
-
+//###############################################################################################################################
+// huge misuse of cin . i forgot all about how it works and now this program is not running properly. fix all cin.
+//###############################################################################################################################
 /*
 version 0.3
 -------------------------------------------------------------
@@ -43,12 +45,14 @@ realspot is a short that converts the input of a spot chosen in room during pick
 weaponvalue stores the value of held weapon for easier access
 cinput stores the input of the player which is a char
 acceptedanswers is a set that holds the accepted values of input
+token is a temporary card which will hold the selected card each time a card is picked for easier access to it
 */
 int progress;
 short realspot;
 short weaponvalue = 0;
 char cinput;
-std::unordered_set<char> acceptedanswers = {1, 2, 3, 4, y, c, h, t, g, s, q};
+//std::unordered_set<char> acceptedanswers = {1, 2, 3, 4, y, c, h, t, g, s, q};
+Card token;
 //--------------BELOW THIS LINE IS THE DECLARATION OF FUNCTIONS--------------------
 void clearScreen()// this is used for cleaner approach with the game. clears terminal clutter.
 {
@@ -59,17 +63,29 @@ void clearScreen()// this is used for cleaner approach with the game. clears ter
     #endif
 }
 /*
-
+Quit reduces hp to 0 thus exiting the loop and quitting the program.
 OpenState is the default idle state of the game. when called prints room, stats and waits for input.
 NewState is used to clear a room after an action then proceed to OpenState.
+AskInput()
+InputCheck()
+PickCard()
+
+MonVal returns a short based on value of monster determined by its rank.
+HeartVal()
+DiaVal()
+FistFight deals damage to hp based on monster value, empties room spot
+WeaponFight calculates damage based on weapon value and monster value, deals damage to hp, empties room spot
+Fight asks user if they wish to fight. choice between using weapon and fists. if weapon is chosen but condition to fight are not met, fists are used instead. always cancellable. calls correct fight function based on case
+
 */
+void TestAsk(Game& play);
 void Quit(Game& play);
 
 void OpenState(Game& play);
 void NewState(Game& play, short clearroom);
 void AskInput();
 void InputCheck(char in);//calls method based on input. if input is room spot it calls pickcard
-void PickCard(short spotpicked);
+void PickCard(Game& play, short spotpicked);
 
 short MonVal(Rank rr);
 short HeartVal(Rank rr);
@@ -77,6 +93,7 @@ short DiaVal(Rank rr);
 void FistFight(Game& play, short value);
 void WeaponFight(Game& play, short value);
 void Fight(Game& play, Card cc);
+void Heal(Game& play, Card cc);
 
 
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
@@ -84,16 +101,48 @@ int main()
 {
     Game play;
     progress = 0;
+    Card testt(THREE, HEARTS);
+    Card testtt(SIX, CLUBS);
+    //here is where the intro comes in
+    //choice for how to play section or skip straight to starting the game
+    //choice for mode. base/blacksmiths/fairies
+    //final words, objective and good luck!
     OpenState(play);
-    play.EmptyRoom();
-    play.PrintRoom();
-    OpenState(play);
+    do
+    {
+        //here is where game will take place
+        TestAsk(play);
+    } while (play.GetHp()>0);
+    std::cout<<"You couldn't survive the dungeon. Someone else might have a chance because of you and thus your soul rests in peace...\nPress Enter to continue...";
+    std::cin.ignore();
 
 
     return 0;
 }
 /*   BELOW THIS LINE ARE THE DEFINITIONS OF FUNCTIONS
 -------------------------------------------------------------*/
+void TestAsk(Game& play)
+{
+    std::cout<<"test method, input here: ";
+    std::cin.get(cinput);
+    short bruh = 69;
+    switch(cinput)
+    {
+    case '1':
+        bruh=1;
+        break;
+    case '2':
+        bruh=2;
+        break;
+    case '3':
+        bruh=3;
+        break;
+    case '4':
+        bruh=4;
+        break;
+    }
+    PickCard(play, bruh);
+}
 void Quit(Game& play)
 {
     play.SetHp(-20);
@@ -126,7 +175,36 @@ void NewState(Game& play, short clearroom)
     play.EmptySpot(clearroom);
     OpenState(play);
 }
-
+void PickCard(Game& play, short spotpicked)
+{
+    realspot = spotpicked - 1;
+    token = play.GetSpot(realspot);
+    switch(token.GetSuit())
+    {
+    case NULLSUIT:
+        std::cout<<"This spot is empty. Please pick a spot with a card.\n";
+        OpenState(play);
+        break;
+    case SPADES:
+    case CLUBS:
+        std::cout<<"You picked "<<token.CardToString()<<std::endl;
+        Fight(play, token);
+        break;
+    case HEARTS:
+        std::cout<<"You picked "<<token.CardToString()<<std::endl;
+        Heal(play, token);
+        //heal() for heals 2-10 and ace. healfay() for jack queen king. use switch statement here
+        break;
+    case DIAMONDS:
+        std::cout<<"You picked "<<token.CardToString()<<std::endl;
+        //equip() for 2-10. forge() for jack queen king ace. use switch statement here
+        break;
+    default :
+        std::cout<<"Some kind of error has occurred. Please report this bug...\nPress Enter to continue...";
+        std::cin.ignore();
+        break;
+    }
+}
 short MonVal(Rank rr)
 {
     switch(rr)
@@ -139,11 +217,44 @@ short MonVal(Rank rr)
         return static_cast<short>(rr);
     }
 }
+short HeartVal(Rank rr)
+{
+    switch(rr)
+    {
+    case 1:
+        return 20;
+    case 11:
+        return 1;
+    case 12:
+        return 2;
+    case 13:
+        return 3;
+    default :
+        return static_cast<short>(rr);
+    }
+}
+short DiaVal(Rank rr)
+{
+    switch(rr)
+    {
+    case 1:
+        return 13;
+    case 11:
+        return 1;
+    case 12:
+        return 2;
+    case 13:
+        return 3;
+    default :
+        return static_cast<short>(rr);
+    }
+}
 void FistFight(Game& play, short value)
 {
     std::cout<<"You fight the monster with your fist. You take "<<-value<<" points of damage and slay the monster.\n";
     play.SetHp(value);
     play.PrintStats();
+    progress++;
     std::cout<<"\nPress Enter to continue...";
     std::cin.ignore();
     NewState(play, realspot);
@@ -159,6 +270,7 @@ void WeaponFight(Game& play, short value)
     play.SetHp(diff);
     play.AddKill(-value);
     play.PrintStats();
+    progress++;
     std::cout<<"\nPress Enter to continue...";
     std::cin.ignore();
     NewState(play, realspot);
@@ -172,17 +284,17 @@ void Fight(Game& play, Card cc)
         short comparekill = lastkill + value;
         if (comparekill>0)
         {
-        std::cout<<"Fight using your weapon. Enter f to use your fists instead ";
-        std::cin.get()>>cinput;
+        std::cout<<"A monster stands in your way. Fight using your weapon? Enter f to use your fists instead ";
+        std::cin.get(cinput);
         switch (cinput)
             {
-            case f:
+            case 'f':
                 FistFight(play, value);
                 break;
-            case q:
+            case 'q':
                 Quit(play);
                 break;
-            case c:
+            case 'c':
                 OpenState(play);
                 break;
             default:
@@ -193,16 +305,16 @@ void Fight(Game& play, Card cc)
         else
         {
             std::cout<<"The last monster you have slain cursed your sword with its value of "<<lastkill<<". You can not use this weapon to fight a monster with an equal or higher value than that. \nEnter f to use your fists instead or c to cancel and go back ";
-            std::cin.get()>>cinput;
+            std::cin.get(cinput);
             switch (cinput)
             {
-            case f:
+            case 'f':
                 FistFight(play, value);
                 break;
-            case q:
+            case 'q':
                 Quit(play);
                 break;
-            case c:
+            case 'c':
                 OpenState(play);
                 break;
             default:
@@ -213,17 +325,17 @@ void Fight(Game& play, Card cc)
     }
     else if (play.CheckWeapHeld() && !play.KillsExist())
     {
-        std::cout<<"Fight using your weapon. Enter f to use your fists instead ";
-        std::cin.get()>>cinput;
+        std::cout<<"A monster stands in your way. Fight using your weapon? Enter f to use your fists instead ";
+        std::cin.get(cinput);
         switch (cinput)
         {
-        case f:
+        case 'f':
             FistFight(play, value);
             break;
-        case q:
-            //calls the quit method
+        case 'q':
+            Quit(play);
             break;
-        case c:
+        case 'c':
             OpenState(play);
             break;
         default:
@@ -237,6 +349,29 @@ void Fight(Game& play, Card cc)
     }
 
 
+}
+void Heal(Game& play, Card cc)
+{
+    short healvalue = HeartVal(cc.GetRank());
+    std::cout<<"You found a potion! Heal your hp? Press Enter to heal or c to Cancel... ";
+    std::cin.get(cinput);
+    switch(cinput)
+    {
+    case 'q':
+        Quit(play);
+        break;
+    case 'c':
+        OpenState(play);
+        break;
+    default :
+        std::cout<<"The potion invigorates you. HP healed.\n";
+        play.SetHp(healvalue);
+        play.PrintStats();
+        std::cout<<"\nPress Enter to continue...";
+        std::cin.ignore();
+        NewState(play, realspot);
+        break;
+    }
 }
 
 
