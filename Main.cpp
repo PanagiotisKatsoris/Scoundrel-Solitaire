@@ -61,18 +61,20 @@ void clearScreen()// this is used for cleaner approach with the game. clears ter
 /*
 Quit reduces hp to 0 thus exiting the loop and quitting the program.
 OpenState is the default idle state of the game. when called prints room, stats and waits for input.
-NewState is used to clear a room after an action then proceed to OpenState.
-AskInput()
-InputCheck()
-PickCard()
+NewState is used to clear a room after an action.
+PickCard checks card at selected spot of rooma and proceed to correct function based on card chosen. if spot is empty resets back to openstate
+AskInput waits for input from user and if it is an accepted input proceeds to inputcheck() otherwise keeps aksing for input.
+InputCheck checks case to handle depending on input. ##right now only goes to pickcard()
+
 
 MonVal returns a short based on value of monster determined by its rank.
-HeartVal()
-DiaVal()
+HeartVal returns a short based on value of potion or fairy (hearts face cards)
+DiaVal returns a short based on value of weapon or how much it forges if blacksmith card (diamond face cards)
 FistFight deals damage to hp based on monster value, empties room spot
 WeaponFight calculates damage based on weapon value and monster value, deals damage to hp, empties room spot
 Fight asks user if they wish to fight. choice between using weapon and fists. if weapon is chosen but condition to fight are not met, fists are used instead. always cancellable. calls correct fight function based on case
-
+Heal heals user hp with potion chosen
+HealFay()
 */
 
 void Quit(Game& play);
@@ -81,9 +83,10 @@ void EnterToContinue();
 
 void OpenState(Game& play);
 void NewState(Game& play, short clearroom);
+void PickCard(Game& play, short spotpicked);
 void AskInput();
 void InputCheck(Game& play);//calls method based on input. if input is room spot it calls pickcard
-void PickCard(Game& play, short spotpicked);
+
 
 short MonVal(Rank rr);
 short HeartVal(Rank rr);
@@ -92,7 +95,7 @@ void FistFight(Game& play, short value);
 void WeaponFight(Game& play, short value);
 void Fight(Game& play, Card cc);
 void Heal(Game& play, Card cc);
-
+void HealFay(Game& play, Card cc);
 
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
 int main()
@@ -105,9 +108,10 @@ int main()
     //choice for how to play section or skip straight to starting the game
     //choice for mode. base/blacksmiths/fairies
     //final words, objective and good luck!
-    OpenState(play);
+
     do
     {
+        OpenState(play);
         //here is where game will take place
         AskInput();
         InputCheck(play);
@@ -161,7 +165,6 @@ void OpenState(Game& play)
 void NewState(Game& play, short clearroom)
 {
     play.EmptySpot(clearroom);
-    OpenState(play);
 }
 void PickCard(Game& play, short spotpicked)
 {
@@ -171,7 +174,6 @@ void PickCard(Game& play, short spotpicked)
     {
     case NULLSUIT:
         std::cout<<"This spot is empty. Please pick a spot with a card.\n";
-        OpenState(play);
         break;
     case SPADES:
     case CLUBS:
@@ -180,8 +182,18 @@ void PickCard(Game& play, short spotpicked)
         break;
     case HEARTS:
         std::cout<<"You picked "<<token.CardToString()<<std::endl;
-        Heal(play, token);
-        //heal() for heals 2-10 and ace. healfay() for jack queen king. use switch statement here
+        switch (token.GetRank())
+        {
+        case ACE:
+        case JACK:
+        case QUEEN:
+        case KING:
+            HealFay(play, token);
+            break;
+        default :
+            Heal(play, token);
+            break;
+        }
         break;
     case DIAMONDS:
         std::cout<<"You picked "<<token.CardToString()<<std::endl;
@@ -241,7 +253,6 @@ void InputCheck(Game& play)
         break;
     default :
         std::cout<<"You failed to pick a card. "<<std::endl;
-        OpenState(play);
         break;
     }
 }
@@ -333,7 +344,6 @@ void Fight(Game& play, Card cc)
                 Quit(play);
                 break;
             case 'c':
-                OpenState(play);
                 break;
             default:
                 WeaponFight(play, value);
@@ -353,10 +363,8 @@ void Fight(Game& play, Card cc)
                 Quit(play);
                 break;
             case 'c':
-                OpenState(play);
                 break;
             default:
-                OpenState(play);
                 break;
             }
         }
@@ -374,7 +382,6 @@ void Fight(Game& play, Card cc)
             Quit(play);
             break;
         case 'c':
-            OpenState(play);
             break;
         default:
             WeaponFight(play, value);
@@ -399,7 +406,6 @@ void Heal(Game& play, Card cc)
         Quit(play);
         break;
     case 'c':
-        OpenState(play);
         break;
     case 'y':
     default :
@@ -408,6 +414,39 @@ void Heal(Game& play, Card cc)
         play.PrintStats();
         EnterToContinue();
         NewState(play, realspot);
+        break;
+    }
+}
+void HealFay(Game& play, Card cc)
+{
+    short healvaluefay = HeartVal(cc.GetRank());
+    std::cout<<"You encounter a healing fairy! It can heal your hp based on the souls currently on your weapon! Press y to heal or c to Cancel... ";
+    if (cc.GetRank() == ACE)
+    {
+        std::cout<<"WOW!"//####################WRITE TEXT FOR ENCOUTNERING LEADER OF FAIRIES OR SOMETHING
+    }
+    AskInput();
+    switch (cinput)
+    {
+    case 'q':
+        Quit(play);
+        break;
+    case 'c':
+        break;
+    case 'y':
+    default ://################# ADD CHECK AND IF ITS AN ACE YOU JUST HEAL 20 EVEN IF YOU DONT HAVE WEAPONKILLS
+        if (play.KillsExist())
+        {
+            std::cout<<"The fairy heals you with its magical powers. HP healed.\n";
+
+        }
+        else
+        {
+            std::cout<<"You receive 0 heal and the fairy disappears."<<std::endl;
+            play.PrintStats();
+            EnterToContinue();
+            NewState(play, realspot);
+        }
         break;
     }
 }

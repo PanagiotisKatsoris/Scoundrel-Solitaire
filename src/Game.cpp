@@ -198,3 +198,7 @@ bool Game::KillsExist()
 {
     return !weapKills.empty();
 }
+size_t Game::NumOfKills()
+{
+    return weapKills.size();
+}

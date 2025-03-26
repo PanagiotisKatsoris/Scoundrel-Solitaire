@@ -70,6 +70,7 @@ class Game
         Card GetSpot(int spt);
         void PrintStats();
         bool KillsExist();
+        size_t NumOfKills();
 
     protected:
 
