@@ -37,18 +37,22 @@ away from and starts being dealt after the initial deck is empty
 //--------------BELOW THIS LINE IS THE DECLARATION OF VARIABLES--------------------
 /*
 progress counts how many monsters are slain and when it reaches 26 with hp>0 it gives victory screen
-realspot is a short that converts the input of a spot chosen in room during picking card phase into the internal number of the real position
+realspot is the real value of the position in the array that represent spots in the room of the card chosen. conversion from what the user typed to what the real value is happens in PickCard()
 weaponvalue stores the value of held weapon for easier access
-cinput stores the input of the player which is a char
+cinput stores the input of the player which is of type char
 acceptedanswers is a set that holds the accepted values of input
 token is a temporary card which will hold the selected card each time a card is picked for easier access to it
+roomfull is a boolean initialized to true, if empty spots exist it sets to false until new room is dealt
+notp is a boolean initialized to false. if teleport is used it will set to true and subsequent teleport will be disabled. when a new card is played from the new room it will set to false again
 */
 int progress;
 short realspot;
 short weaponvalue = 0;
 char cinput;
-std::unordered_set<char> acceptedanswers = {'1', '2', '3', '4', 'y', 'c', 'h', 't', 'g', 's', 'q', 'f'};
+std::unordered_set<char> acceptedanswers = {'1', '2', '3', '4', 'y', 'c', 'h', 't', 'g', 's', 'q', 'f', 'n'};
 Card token;
+bool roomfull = true;
+bool notp = false;
 //--------------BELOW THIS LINE IS THE DECLARATION OF FUNCTIONS--------------------
 void clearScreen()// this is used for cleaner approach with the game. clears terminal clutter.
 {
@@ -62,9 +66,9 @@ void clearScreen()// this is used for cleaner approach with the game. clears ter
 Quit reduces hp to 0 thus exiting the loop and quitting the program.
 OpenState is the default idle state of the game. when called prints room, stats and waits for input.
 NewState is used to clear a room after an action.
-PickCard checks card at selected spot of rooma and proceed to correct function based on card chosen. if spot is empty resets back to openstate
+PickCard checks card at selected spot of room and proceed to correct function based on card chosen. if spot is empty does nothing
 AskInput waits for input from user and if it is an accepted input proceeds to inputcheck() otherwise keeps aksing for input.
-InputCheck checks case to handle depending on input. ##right now only goes to pickcard()
+InputCheck checks case to handle depending on input. ###right now only goes to pickcard()
 
 
 MonVal returns a short based on value of monster determined by its rank.
@@ -96,14 +100,13 @@ void WeaponFight(Game& play, short value);
 void Fight(Game& play, Card cc);
 void Heal(Game& play, Card cc);
 void HealFay(Game& play, Card cc);
+void Equip(Game& play, Card cc);
 
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
 int main()
 {
     Game play;
     progress = 0;
-    Card testt(THREE, HEARTS);
-    Card testtt(SIX, CLUBS);
     //here is where the intro comes in
     //choice for how to play section or skip straight to starting the game
     //choice for mode. base/blacksmiths/fairies
@@ -141,7 +144,7 @@ void EnterToContinue()
 
 void OpenState(Game& play)
 {
-    //clearScreen();-------------------------------temporarily disabled for testing purposes.
+    clearScreen();//-------------------------------temporarily disabled for testing purposes.
     int nullcounter = 0;
     for (int roomcounter = 0; roomcounter <4; roomcounter++)
     {
@@ -174,12 +177,13 @@ void PickCard(Game& play, short spotpicked)
     {
     case NULLSUIT:
         std::cout<<"This spot is empty. Please pick a spot with a card.\n";
-        break;
+        EnterToContinue();
+        return;
     case SPADES:
     case CLUBS:
         std::cout<<"You picked "<<token.CardToString()<<std::endl;
         Fight(play, token);
-        break;
+        return;
     case HEARTS:
         std::cout<<"You picked "<<token.CardToString()<<std::endl;
         switch (token.GetRank())
@@ -189,20 +193,21 @@ void PickCard(Game& play, short spotpicked)
         case QUEEN:
         case KING:
             HealFay(play, token);
-            break;
+            return;
         default :
             Heal(play, token);
-            break;
+            return;
         }
-        break;
+        return;
     case DIAMONDS:
         std::cout<<"You picked "<<token.CardToString()<<std::endl;
         //equip() for 2-10. forge() for jack queen king ace. use switch statement here
-        break;
+        Equip(play, token);
+        return;
     default :
         std::cout<<"Some kind of error has occurred. Please report this bug...";
         EnterToContinue();
-        break;
+        return;
     }
 }
 void AskInput()
@@ -220,7 +225,7 @@ void AskInput()
         }
         else if (acceptedanswers.find(cinput)!=acceptedanswers.end())
         {
-            break;
+            return;
         }
         else if (acceptedanswers.find(cinput)==acceptedanswers.end())
         {
@@ -241,19 +246,19 @@ void InputCheck(Game& play)
     {
     case '1':
         PickCard(play, 1);
-        break;
+        return;
     case '2':
         PickCard(play, 2);
-        break;
+        return;
     case '3':
         PickCard(play, 3);
-        break;
+        return;
     case '4':
         PickCard(play, 4);
-        break;
+        return;
     default :
         std::cout<<"You failed to pick a card. "<<std::endl;
-        break;
+        return;
     }
 }
 short MonVal(Rank rr)
@@ -339,15 +344,19 @@ void Fight(Game& play, Card cc)
             {
             case 'f':
                 FistFight(play, value);
-                break;
+                return;
             case 'q':
                 Quit(play);
-                break;
+                return;
             case 'c':
-                break;
-            default:
+                return;
+            case 'y':
                 WeaponFight(play, value);
-                break;
+                return;
+            default:
+                std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+                EnterToContinue();
+                return;
             }
         }
         else
@@ -358,34 +367,38 @@ void Fight(Game& play, Card cc)
             {
             case 'f':
                 FistFight(play, value);
-                break;
+                return;
             case 'q':
                 Quit(play);
-                break;
+                return;
             case 'c':
-                break;
+                return;
             default:
-                break;
+                return;
             }
         }
     }
     else if (play.CheckWeapHeld() && !play.KillsExist())
     {
-        std::cout<<"A monster stands in your way. Enter y to use your weapon or f to use your fists ";
+        std::cout<<"A monster stands in your way. Press y to use your weapon or f to use your fists ";
         AskInput();
         switch (cinput)
         {
         case 'f':
             FistFight(play, value);
-            break;
+            return;
         case 'q':
             Quit(play);
-            break;
+            return;
         case 'c':
-            break;
-        default:
+            return;
+        case 'y':
             WeaponFight(play, value);
-            break;
+            return;
+        default:
+            std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+            EnterToContinue();
+            return;
         }
     }
     else
@@ -404,53 +417,110 @@ void Heal(Game& play, Card cc)
     {
     case 'q':
         Quit(play);
-        break;
+        return;
     case 'c':
-        break;
+        return;
     case 'y':
-    default :
         std::cout<<"The potion invigorates you. HP healed.\n";
         play.SetHp(healvalue);
         play.PrintStats();
         EnterToContinue();
         NewState(play, realspot);
-        break;
+        return;
+    default:
+        std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+        EnterToContinue();
+        return;
     }
 }
 void HealFay(Game& play, Card cc)
 {
     short healvaluefay = HeartVal(cc.GetRank());
-    std::cout<<"You encounter a healing fairy! It can heal your hp based on the souls currently on your weapon! Press y to heal or c to Cancel... ";
     if (cc.GetRank() == ACE)
     {
-        std::cout<<"WOW!"//####################WRITE TEXT FOR ENCOUTNERING LEADER OF FAIRIES OR SOMETHING
+        std::cout<<"WOW! You encounter a fairy with immense aura! This ACE fairy can heal you to full hp regardless of your weapon. Press y to heal or c to Cancel...";
+        AskInput();
+        switch (cinput)
+        {
+        case 'q':
+            Quit(play);
+            return;
+        case 'c':
+            return;
+        case 'y':
+            std::cout<<"The fairy heals you with its magical powers. HP healed.\n";
+            play.SetHp(healvaluefay);
+            play.PrintStats();
+            EnterToContinue();
+            NewState(play, realspot);
+            return;
+        default:
+            std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+            EnterToContinue();
+            return;
+        }
     }
+    std::cout<<"You encounter a healing fairy! It can heal your hp based on the souls currently on your weapon! Press y to heal or c to Cancel... ";
     AskInput();
     switch (cinput)
     {
     case 'q':
         Quit(play);
-        break;
+        return;
     case 'c':
-        break;
+        return;
     case 'y':
-    default ://################# ADD CHECK AND IF ITS AN ACE YOU JUST HEAL 20 EVEN IF YOU DONT HAVE WEAPONKILLS
         if (play.KillsExist())
         {
             std::cout<<"The fairy heals you with its magical powers. HP healed.\n";
-
+            size_t healcalc = play.NumOfKills();
+            healcalc = healcalc * healvaluefay;
+            short finalheal = static_cast<short>(healcalc);
+            play.SetHp(finalheal);
         }
         else
         {
             std::cout<<"You receive 0 heal and the fairy disappears."<<std::endl;
-            play.PrintStats();
-            EnterToContinue();
-            NewState(play, realspot);
         }
-        break;
+        play.PrintStats();
+        EnterToContinue();
+        NewState(play, realspot);
+        return;
+    default:
+        std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+        EnterToContinue();
+        return;
     }
 }
-
+void Equip(Game& play, Card cc)
+{
+    std::cout<<"You found a weapon. Press y to equip the new weapon, n to skip it or c to Cancel... ";
+    AskInput();
+    switch (cinput)
+    {
+    case 'q':
+        Quit(play);
+        return;
+    case 'c':
+        return;
+    case 'n':
+        std::cout<<"You decide to skip the weapon and move past it."<<std::endl;
+        break;
+    case 'y':
+        std::cout<<"You equip the new weapon."<<std::endl;
+        play.ChangeWeapon(cc);
+        weaponvalue = DiaVal(cc.GetRank());
+        break;
+    default:
+        std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+        EnterToContinue();
+        return;
+    }
+    play.PrintStats();
+    EnterToContinue();
+    NewState(play, realspot);
+    return;
+}
 
 // --------- BELOW THIS LINE ARE THE CONTROLS-------------------
 /*

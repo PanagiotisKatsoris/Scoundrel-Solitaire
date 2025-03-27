@@ -44,6 +44,8 @@ void Game::PrintRoom()
     std::cout<<"-----------------------------------"<<std::endl;
     for (int i = 0; i<4; i++)
     {
+        int spc = i+1;
+        std::cout<<spc<<": ";
         room[i].PrintCard();
     }
     std::cout<<"-----------------------------------"<<std::endl;
@@ -98,7 +100,7 @@ void Game::DealRoom()
         {
             DealSpot(i);
         }
-        else
+        else//here check if secondary deck is empty to draw from there???
         {
             break;
         }
@@ -188,10 +190,10 @@ void Game::PrintStats()
     if(weapHeld && !weapKills.empty())
     {
         int wpklltemp = *weapKills.begin();
-        std::cout<<"The last monster you killed with this weapon had "<<wpklltemp<<" power."<<std::endl;
+        std::cout<<"Weapon cursed and can slay only lower than "<<wpklltemp<<" power monsters."<<std::endl;
     } else if(weapHeld && weapKills.empty())
     {
-        std::cout<<"You have not killed any monsters with this weapon yet."<<std::endl;
+        std::cout<<"You have not slayed any monsters with this weapon yet."<<std::endl;
     }
 }
 bool Game::KillsExist()

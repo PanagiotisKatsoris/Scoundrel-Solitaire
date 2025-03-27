@@ -49,6 +49,12 @@ class Game
         RemoveHearts draws the hearts face cards along with the ace of hearts. used to set up base game rules
 
         GetSpot returns the card held at given position in room[]
+
+        PrintStats prints current stats of hp weapon and if weapon exists also weapon kills(only the value of the last monster slain)
+
+        KillsExist checks if weapKills is empty. if its not empty returns true
+
+        NumOfKills returns the size_t of the weapKills set
         */
         void SetHp(short s);//takes damage or heals hp. in case hp drops to zero or below it becomes 0, in case hp goes to 20 or above it becomes 20
         short GetHp();//returns hp var
