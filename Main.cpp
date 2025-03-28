@@ -78,7 +78,9 @@ FistFight deals damage to hp based on monster value, empties room spot
 WeaponFight calculates damage based on weapon value and monster value, deals damage to hp, empties room spot
 Fight asks user if they wish to fight. choice between using weapon and fists. if weapon is chosen but condition to fight are not met, fists are used instead. always cancellable. calls correct fight function based on case
 Heal heals user hp with potion chosen
-HealFay()
+HealFay heals user hp based on number of kills (weapkills size) on their weapon and the value of face card or 20 hp with ace card
+Equip either changes weapon to selected card or discards selected card
+Forge ()
 */
 
 void Quit(Game& play);
@@ -101,6 +103,7 @@ void Fight(Game& play, Card cc);
 void Heal(Game& play, Card cc);
 void HealFay(Game& play, Card cc);
 void Equip(Game& play, Card cc);
+void Forge(Game& play, Card cc);
 
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
 int main()
@@ -521,7 +524,37 @@ void Equip(Game& play, Card cc)
     NewState(play, realspot);
     return;
 }
-
+void Forge(Game& play, Card cc)
+{
+    short forge = DiaVal(cc.GetRank());
+    if (cc.GetRank() == ACE)
+    {
+        std::cout<"WOW! You encounter a forging fairy with immense aura! This ACE fairy can fully repair your weapon and remove all curses from it . Press y to accept or c to Cancel... ";
+        AskInput();
+        switch (cinput)
+        {
+        case 'q':
+            Quit(play);
+            return;
+        case 'c':
+            return;
+        case 'y':
+            if (!play.CheckWeapHeld())
+            {
+                std::cout<<"You do not have a weapon and the fairy disappears without any effect."<<std::endl;
+            }
+            else
+            {
+                play.RemoveKill(forge);
+            }
+        default:
+            std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+            EnterToContinue();
+            return;
+        }
+    }
+    std::cout<<"You encounter a forging fairy. It can remove an amount of curses from your weapon. Press y to accept or c to Cancel... ";
+}
 // --------- BELOW THIS LINE ARE THE CONTROLS-------------------
 /*
 h=show controls
