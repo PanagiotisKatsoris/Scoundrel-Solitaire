@@ -117,6 +117,11 @@ int main()
 
     do
     {
+        if (progress>=26)
+        {
+            std::cout<<"PLACEHOLDER--> YOU WIN !!! gzzz"<<std::endl;
+            return 0;
+        }
         OpenState(play);
         //here is where game will take place
         AskInput();
@@ -144,7 +149,6 @@ void EnterToContinue()
     std::cout<<"\nPress Enter to continue..."<<std::endl;
     std::cin.get();
 }
-
 void OpenState(Game& play)
 {
     clearScreen();//-------------------------------temporarily disabled for testing purposes.
@@ -165,9 +169,8 @@ void OpenState(Game& play)
     std::cout<<""<<std::endl;
     play.PrintRoom();
     play.PrintStats();
-    std::cout<<"(Type h to see all controls)\nPick a card: ";
+    std::cout<<"-----------------------------------\n(Type h to see all controls)\nPick a card: ";
 }
-
 void NewState(Game& play, short clearroom)
 {
     play.EmptySpot(clearroom);
@@ -184,11 +187,11 @@ void PickCard(Game& play, short spotpicked)
         return;
     case SPADES:
     case CLUBS:
-        std::cout<<"You picked "<<token.CardToString()<<std::endl;
+        std::cout<<"You picked "<<token.CardToString()<<"\n-----------------------------------"<<std::endl;
         Fight(play, token);
         return;
     case HEARTS:
-        std::cout<<"You picked "<<token.CardToString()<<std::endl;
+        std::cout<<"You picked "<<token.CardToString()<<"\n-----------------------------------"<<std::endl;
         switch (token.GetRank())
         {
         case ACE:
@@ -203,9 +206,19 @@ void PickCard(Game& play, short spotpicked)
         }
         return;
     case DIAMONDS:
-        std::cout<<"You picked "<<token.CardToString()<<std::endl;
-        //equip() for 2-10. forge() for jack queen king ace. use switch statement here
-        Equip(play, token);
+        std::cout<<"You picked "<<token.CardToString()<<"\n-----------------------------------"<<std::endl;
+        switch(token.GetRank())
+        {
+        case ACE:
+        case JACK:
+        case QUEEN:
+        case KING:
+            Forge(play, token);
+            return;
+        default:
+            Equip(play, token);
+            return;
+        }
         return;
     default :
         std::cout<<"Some kind of error has occurred. Please report this bug...";
@@ -312,6 +325,7 @@ void FistFight(Game& play, short value)
 {
     std::cout<<"You fight the monster with your fist. You take "<<-value<<" points of damage and slay the monster.\n";
     play.SetHp(value);
+    std::cout<<"-----------------------------------"<<std::endl;
     play.PrintStats();
     progress++;
     EnterToContinue();
@@ -327,6 +341,7 @@ void WeaponFight(Game& play, short value)
     std::cout<<"You fight the monster with your weapon. You take "<<-diff<<" points of damage and slay the monster. The monster curses your weapon.\n";
     play.SetHp(diff);
     play.AddKill(-value);
+    std::cout<<"-----------------------------------"<<std::endl;
     play.PrintStats();
     progress++;
     EnterToContinue();
@@ -426,6 +441,7 @@ void Heal(Game& play, Card cc)
     case 'y':
         std::cout<<"The potion invigorates you. HP healed.\n";
         play.SetHp(healvalue);
+        std::cout<<"-----------------------------------"<<std::endl;
         play.PrintStats();
         EnterToContinue();
         NewState(play, realspot);
@@ -453,6 +469,7 @@ void HealFay(Game& play, Card cc)
         case 'y':
             std::cout<<"The fairy heals you with its magical powers. HP healed.\n";
             play.SetHp(healvaluefay);
+            std::cout<<"-----------------------------------"<<std::endl;
             play.PrintStats();
             EnterToContinue();
             NewState(play, realspot);
@@ -485,6 +502,7 @@ void HealFay(Game& play, Card cc)
         {
             std::cout<<"You receive 0 heal and the fairy disappears."<<std::endl;
         }
+        std::cout<<"-----------------------------------"<<std::endl;
         play.PrintStats();
         EnterToContinue();
         NewState(play, realspot);
@@ -519,6 +537,7 @@ void Equip(Game& play, Card cc)
         EnterToContinue();
         return;
     }
+    std::cout<<"-----------------------------------"<<std::endl;
     play.PrintStats();
     EnterToContinue();
     NewState(play, realspot);
@@ -529,7 +548,7 @@ void Forge(Game& play, Card cc)
     short forge = DiaVal(cc.GetRank());
     if (cc.GetRank() == ACE)
     {
-        std::cout<"WOW! You encounter a forging fairy with immense aura! This ACE fairy can fully repair your weapon and remove all curses from it . Press y to accept or c to Cancel... ";
+        std::cout<<"WOW! You encounter a forging fairy with immense aura! This ACE fairy can fully repair your weapon and remove all curses from it . Press y to accept or c to Cancel... ";
         AskInput();
         switch (cinput)
         {
@@ -546,14 +565,48 @@ void Forge(Game& play, Card cc)
             else
             {
                 play.RemoveKill(forge);
+                std::cout<<"Your weapon is cleansed. The fairy disappears."<<std::endl;
             }
+            break;
         default:
             std::cout<<"Something went wrong. Check your inputs."<<std::endl;
             EnterToContinue();
             return;
         }
     }
-    std::cout<<"You encounter a forging fairy. It can remove an amount of curses from your weapon. Press y to accept or c to Cancel... ";
+    else
+    {
+        std::cout<<"You encounter a forging fairy. It can remove an amount of curses from your weapon. Press y to accept or c to Cancel... ";
+        AskInput();
+        switch(cinput)
+        {
+        case 'q':
+            Quit(play);
+            return;
+        case 'c':
+            return;
+        case 'y':
+            if (!play.CheckWeapHeld())
+            {
+                std::cout<<"You do not have a weapon and the fairy disappears without any effect."<<std::endl;
+            }
+            else
+            {
+                play.RemoveKill(forge);
+                std::cout<<"Your weapon is cleansed. The fairy disappears."<<std::endl;
+            }
+            break;
+        default:
+            std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+            EnterToContinue();
+            return;
+        }
+    }
+    std::cout<<"-----------------------------------"<<std::endl;
+    play.PrintStats();
+    EnterToContinue();
+    NewState(play, realspot);
+    return;
 }
 // --------- BELOW THIS LINE ARE THE CONTROLS-------------------
 /*

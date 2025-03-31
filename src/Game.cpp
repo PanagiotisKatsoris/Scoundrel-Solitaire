@@ -190,7 +190,7 @@ void Game::PrintStats()
     if(weapHeld && !weapKills.empty())
     {
         int wpklltemp = *weapKills.begin();
-        std::cout<<"Weapon cursed and can slay only lower than "<<wpklltemp<<" power monsters."<<std::endl;
+        std::cout<<"Weapon cursed. Can not slay "<<wpklltemp<<"-power or higher monsters."<<std::endl;
     } else if(weapHeld && weapKills.empty())
     {
         std::cout<<"You have not slayed any monsters with this weapon yet."<<std::endl;
