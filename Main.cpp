@@ -8,8 +8,9 @@
 #include <cstdlib>
 #include <set>
 #include <limits>
+#include <deque>
 /*
-version 0.4.2
+version 0.4.5
 -------------------------------------------------------------
 method and variable explanation exists mostly in header files
 -------------------------------------------------------------
@@ -18,21 +19,13 @@ Current version creates a deck of 52 playing cards. Creates a player with 20 hp,
 TODO
 documentation
 
-ordering of methods in Game class.better organization and grouping for better readability.
-game mode basic should not include face cards and aces of diamonds and hearts
-add choice for modules: face cards of diamonds are blacksmiths, hearts are fairies. maybe a module with jokers(maybe they are double edged swords that either help or hinder the player)
-secondary deck which might be a vector or something to add cards from teleport function
-if secondary deck is not empty then dealroom will continue drawing from that if original deck is emptied
+visibility on number of kills on a weapon
 define controls(check comment at bottom)
 add restart game--debatable--
 add prologue to game
 add how to play section, could be shown or skipped
 add guide of card values
 
-
-very later stage to RUN FRoM ROOM. this will be Teleport away and
-will use a second deck that stores rooms which have been teleported
-away from and starts being dealt after the initial deck is empty
 */
 //--------------BELOW THIS LINE IS THE DECLARATION OF VARIABLES--------------------
 /*
@@ -44,15 +37,17 @@ acceptedanswers is a set that holds the accepted values of input
 token is a temporary card which will hold the selected card each time a card is picked for easier access to it
 roomfull is a boolean initialized to true, if empty spots exist it sets to false until new room is dealt
 notp is a boolean initialized to false. if teleport is used it will set to true and subsequent teleport will be disabled. when a new card is played from the new room it will set to false again
+expansion is a boolean which is set true until an game mode is selected either with or without expansions which is then set to false so game can start
 */
 int progress;
 short realspot;
 short weaponvalue = 0;
 char cinput;
-std::unordered_set<char> acceptedanswers = {'1', '2', '3', '4', 'y', 'c', 'h', 't', 'g', 's', 'q', 'f', 'n'};
+std::unordered_set<char> acceptedanswers = {'1', '2', '3', '4', 'c', 'f', 'g', 'h', 'n', 'q', 's', 't', 'y'};
 Card token;
 bool roomfull = true;
 bool notp = false;
+bool expansion = true;
 //--------------BELOW THIS LINE IS THE DECLARATION OF FUNCTIONS--------------------
 void clearScreen()// this is used for cleaner approach with the game. clears terminal clutter.
 {
@@ -64,12 +59,13 @@ void clearScreen()// this is used for cleaner approach with the game. clears ter
 }
 /*
 Quit reduces hp to 0 thus exiting the loop and quitting the program.
+
 OpenState is the default idle state of the game. when called prints room, stats and waits for input.
 NewState is used to clear a room after an action.
 PickCard checks card at selected spot of room and proceed to correct function based on card chosen. if spot is empty does nothing
 AskInput waits for input from user and if it is an accepted input proceeds to inputcheck() otherwise keeps aksing for input.
-InputCheck checks case to handle depending on input. ###right now only goes to pickcard()
-
+InputCheck checks case to handle depending on input.
+ExpansionCheck asks for input and chooses which expansions to be included by removing the appropirate cards from the deck in each case
 
 MonVal returns a short based on value of monster determined by its rank.
 HeartVal returns a short based on value of potion or fairy (hearts face cards)
@@ -80,7 +76,8 @@ Fight asks user if they wish to fight. choice between using weapon and fists. if
 Heal heals user hp with potion chosen
 HealFay heals user hp based on number of kills (weapkills size) on their weapon and the value of face card or 20 hp with ace card
 Equip either changes weapon to selected card or discards selected card
-Forge ()
+Forge removes values from lowest to higher from the weapkills set essentially allowing a weapon to reach a previous state of what power level of monsters it can kill
+TpAway at the start of the room and also not directly after this has been used again, removes all 4 cards and places them at the end of the dungeon to be faced at a later time
 */
 
 void Quit(Game& play);
@@ -91,7 +88,8 @@ void OpenState(Game& play);
 void NewState(Game& play, short clearroom);
 void PickCard(Game& play, short spotpicked);
 void AskInput();
-void InputCheck(Game& play);//calls method based on input. if input is room spot it calls pickcard
+void InputCheck(Game& play);
+void ExpansionCheck(Game& play);
 
 
 short MonVal(Rank rr);
@@ -104,6 +102,7 @@ void Heal(Game& play, Card cc);
 void HealFay(Game& play, Card cc);
 void Equip(Game& play, Card cc);
 void Forge(Game& play, Card cc);
+void TpAway(Game& play);
 
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
 int main()
@@ -111,14 +110,17 @@ int main()
     Game play;
     progress = 0;
     //here is where the intro comes in
-    //choice for how to play section or skip straight to starting the game
-    //choice for mode. base/blacksmiths/fairies
     //final words, objective and good luck!
+    do
+    {
+        ExpansionCheck(play);
+    } while (expansion);
 
     do
     {
         if (progress>=26)
         {
+            clearScreen();
             std::cout<<"PLACEHOLDER--> YOU WIN !!! gzzz"<<std::endl;
             return 0;
         }
@@ -151,8 +153,9 @@ void EnterToContinue()
 }
 void OpenState(Game& play)
 {
-    clearScreen();//-------------------------------temporarily disabled for testing purposes.
+    clearScreen();
     int nullcounter = 0;
+    roomfull = false;
     for (int roomcounter = 0; roomcounter <4; roomcounter++)
     {
         switch((play.GetSpot(roomcounter)).GetSuit())
@@ -165,15 +168,21 @@ void OpenState(Game& play)
     if(nullcounter>=3)
     {
         play.DealRoom();
+        roomfull=true;
     }
     std::cout<<""<<std::endl;
     play.PrintRoom();
+    if (roomfull==true)
+    {
+        std::cout<<"### You Enter A New Room ###\n-----------------------------------"<<std::endl;
+    }
     play.PrintStats();
     std::cout<<"-----------------------------------\n(Type h to see all controls)\nPick a card: ";
 }
 void NewState(Game& play, short clearroom)
 {
     play.EmptySpot(clearroom);
+    notp=false;
 }
 void PickCard(Game& play, short spotpicked)
 {
@@ -272,9 +281,50 @@ void InputCheck(Game& play)
     case '4':
         PickCard(play, 4);
         return;
-    default :
-        std::cout<<"You failed to pick a card. "<<std::endl;
+    case 't':
+        TpAway(play);
         return;
+    default :
+        std::cout<<"You failed to choose a correct action! "<<std::endl;
+        EnterToContinue();
+        return;
+    }
+}
+void ExpansionCheck(Game& play)
+{
+    clearScreen();
+    std::cout<<"Before proceeding you should choose a game mode.\nType 1 to select the Base Game mode with only the basic cards and rules\nType 2 to add the Healing Fairies expansion to the base game\nType 3 to add the Forging Fairies expansion to the base game\nType 4 to add all expansions to the base game and play the Full Game mode\nYour choice : ";
+    AskInput();
+    switch(cinput)
+    {
+        case '1':
+            play.RemoveDiamonds();
+            play.RemoveHearts();
+            expansion=false;
+            std::cout<<"Proceeding to Base Game... "<<std::endl;
+            EnterToContinue();
+            break;
+        case '2':
+            play.RemoveDiamonds();
+            expansion=false;
+            std::cout<<"Proceeding to Base Game with Healing fairies expansion... "<<std::endl;
+            EnterToContinue();
+            break;
+        case '3':
+            play.RemoveHearts();
+            expansion=false;
+            std::cout<<"Proceeding to Base Game with Forging Fairies expansion... "<<std::endl;
+            EnterToContinue();
+            break;
+        case '4':
+            expansion=false;
+            std::cout<<"Proceeding to Full Game...\nAll expansions added... "<<std::endl;
+            EnterToContinue();
+            break;
+        default :
+            std::cout<<"Invalid Input. Try Again"<<std:endl;
+            EnterToContinue();
+            break;
     }
 }
 short MonVal(Rank rr)
@@ -457,7 +507,7 @@ void HealFay(Game& play, Card cc)
     short healvaluefay = HeartVal(cc.GetRank());
     if (cc.GetRank() == ACE)
     {
-        std::cout<<"WOW! You encounter a fairy with immense aura! This ACE fairy can heal you to full hp regardless of your weapon. Press y to heal or c to Cancel...";
+        std::cout<<"WOW! You encounter a fairy with immense aura! This ACE fairy can heal you to full hp. Press y to heal or c to Cancel...";
         AskInput();
         switch (cinput)
         {
@@ -606,6 +656,46 @@ void Forge(Game& play, Card cc)
     play.PrintStats();
     EnterToContinue();
     NewState(play, realspot);
+    return;
+}
+void TpAway(Game& play)
+{
+    if (notp==true)
+    {
+        std::cout<<"You can not teleport twice in a row. Enter a new room and then you can use this ability again "<<std::endl;
+        EnterToContinue();
+        return;
+    }
+    else if (notp==false && roomfull==false)
+    {
+        std::cout<<"You can only teleport at the start of a new room. Enter a new room and then you can use this ability again "<<std::endl;
+        EnterToContinue();
+        return;
+    }
+    else if (notp==false && roomfull==true)
+    {
+        std::cout<<"You want to use your teleport spell and send these cards to the end of the dungeon. Press y to continue or c to Cancel... ";
+        AskInput();
+        switch(cinput)
+        {
+        case 'q':
+            Quit(play);
+            return;
+        case 'c':
+            return;
+        case 'y':
+            std::cout<<"You cast your Teleport Spell and enter a new room! "<<std::endl;
+            play.Teleport();
+            break;
+        default:
+            std::cout<<"Something went wrong. Check your inputs."<<std::endl;
+            EnterToContinue();
+            return;
+        }
+    }
+    std::cout<<"-----------------------------------"<<std::endl;
+    play.PrintStats();
+    EnterToContinue();
     return;
 }
 // --------- BELOW THIS LINE ARE THE CONTROLS-------------------
