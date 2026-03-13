@@ -10,7 +10,8 @@
 #include <limits>
 #include <deque>
 /*
-version 0.4.5
+version 0.9.0
+Original Game Rules by Zach Gage and Kurt Bieg (2011)
 -------------------------------------------------------------
 method and variable explanation exists mostly in header files
 -------------------------------------------------------------
@@ -58,7 +59,7 @@ void clearScreen()// this is used for cleaner approach with the game. clears ter
     #endif
 }
 /*
-Quit reduces hp to 0 thus exiting the loop and quitting the program.
+Quit calls the std::exit() function to terminate program.
 
 OpenState is the default idle state of the game. when called prints room, stats and waits for input.
 NewState is used to clear a room after an action.
@@ -78,9 +79,15 @@ HealFay heals user hp based on number of kills (weapkills size) on their weapon 
 Equip either changes weapon to selected card or discards selected card
 Forge removes values from lowest to higher from the weapkills set essentially allowing a weapon to reach a previous state of what power level of monsters it can kill
 TpAway at the start of the room and also not directly after this has been used again, removes all 4 cards and places them at the end of the dungeon to be faced at a later time
+
+Intro prints a short intro to the game
+HowToPlay asks for user input and if user accepts prints a short description of the basic rules. afterwards asks user if they want to view rules for expansions and calls ExpansionRules if yes
+ExpansionRules prints a short description of each game mode
+Guide prints out small description of each card's value
+ListControls prints each available control available to the player
 */
 
-void Quit(Game& play);
+void Quit();
 void ClearBuffer();
 void EnterToContinue();
 
@@ -104,13 +111,19 @@ void Equip(Game& play, Card cc);
 void Forge(Game& play, Card cc);
 void TpAway(Game& play);
 
+void Intro();
+void HowToPlay();
+void ExpansionRules();
+void Guide();
+void ListControls();
+
 //---------------BELOW THIS LINE IS THE MAIN FUNCTION ---------------
 int main()
 {
     Game play;
     progress = 0;
-    //here is where the intro comes in
-    //final words, objective and good luck!
+    Intro();
+    HowToPlay();
     do
     {
         ExpansionCheck(play);
@@ -131,16 +144,14 @@ int main()
     } while (play.GetHp()>0);
     std::cout<<"PLACEHOLDER->You couldn't survive the dungeon. Someone else might have a chance because of you and thus your soul rests in peace...";
     EnterToContinue();
-
-
     return 0;
 }
 /*   BELOW THIS LINE ARE THE DEFINITIONS OF FUNCTIONS
 -------------------------------------------------------------*/
 
-void Quit(Game& play)
+void Quit()//might add question before exiting
 {
-    play.SetHp(-20);
+    std::exit(0);
 }
 void ClearBuffer()
 {
@@ -284,6 +295,15 @@ void InputCheck(Game& play)
     case 't':
         TpAway(play);
         return;
+    case 'q':
+        Quit();
+        return;
+    case 'h':
+        ListControls();
+        return;
+    case 'r':
+        HowToPlay();
+        return;
     default :
         std::cout<<"You failed to choose a correct action! "<<std::endl;
         EnterToContinue();
@@ -293,7 +313,7 @@ void InputCheck(Game& play)
 void ExpansionCheck(Game& play)
 {
     clearScreen();
-    std::cout<<"Before proceeding you should choose a game mode.\nType 1 to select the Base Game mode with only the basic cards and rules\nType 2 to add the Healing Fairies expansion to the base game\nType 3 to add the Forging Fairies expansion to the base game\nType 4 to add all expansions to the base game and play the Full Game mode\nYour choice : ";
+    std::cout<<"Before proceeding you should choose a game mode.\nType 1 to select the Base Game mode with only the basic cards and rules\nType 2 to add the Healing Fairies expansion to the base game\nType 3 to add the Forging Fairies expansion to the base game\nType 4 to add all expansions to the base game and play the Full Game mode\nIf you want to see each expansion press h\nYour choice : ";
     AskInput();
     switch(cinput)
     {
@@ -321,8 +341,12 @@ void ExpansionCheck(Game& play)
             std::cout<<"Proceeding to Full Game...\nAll expansions added... "<<std::endl;
             EnterToContinue();
             break;
+        case 'h':
+            ExpansionRules();
+            EnterToContinue();
+            break;
         default :
-            std::cout<<"Invalid Input. Try Again"<<std:endl;
+            std::cout<<"Invalid Input. Try Again"<<std::endl;
             EnterToContinue();
             break;
     }
@@ -414,7 +438,7 @@ void Fight(Game& play, Card cc)
                 FistFight(play, value);
                 return;
             case 'q':
-                Quit(play);
+                Quit();
                 return;
             case 'c':
                 return;
@@ -437,7 +461,7 @@ void Fight(Game& play, Card cc)
                 FistFight(play, value);
                 return;
             case 'q':
-                Quit(play);
+                Quit();
                 return;
             case 'c':
                 return;
@@ -456,7 +480,7 @@ void Fight(Game& play, Card cc)
             FistFight(play, value);
             return;
         case 'q':
-            Quit(play);
+            Quit();
             return;
         case 'c':
             return;
@@ -484,7 +508,7 @@ void Heal(Game& play, Card cc)
     switch(cinput)
     {
     case 'q':
-        Quit(play);
+        Quit();
         return;
     case 'c':
         return;
@@ -512,7 +536,7 @@ void HealFay(Game& play, Card cc)
         switch (cinput)
         {
         case 'q':
-            Quit(play);
+            Quit();
             return;
         case 'c':
             return;
@@ -535,7 +559,7 @@ void HealFay(Game& play, Card cc)
     switch (cinput)
     {
     case 'q':
-        Quit(play);
+        Quit();
         return;
     case 'c':
         return;
@@ -570,7 +594,7 @@ void Equip(Game& play, Card cc)
     switch (cinput)
     {
     case 'q':
-        Quit(play);
+        Quit();
         return;
     case 'c':
         return;
@@ -603,7 +627,7 @@ void Forge(Game& play, Card cc)
         switch (cinput)
         {
         case 'q':
-            Quit(play);
+            Quit();
             return;
         case 'c':
             return;
@@ -631,7 +655,7 @@ void Forge(Game& play, Card cc)
         switch(cinput)
         {
         case 'q':
-            Quit(play);
+            Quit();
             return;
         case 'c':
             return;
@@ -679,7 +703,7 @@ void TpAway(Game& play)
         switch(cinput)
         {
         case 'q':
-            Quit(play);
+            Quit();
             return;
         case 'c':
             return;
@@ -697,6 +721,108 @@ void TpAway(Game& play)
     play.PrintStats();
     EnterToContinue();
     return;
+}
+void Intro()
+{
+    clearScreen();
+    std::cout<<"Scoundrel\nA solitaire dungeon crawl game\nBased on the original game by Zach Gage and Kurt Bieg"<<std::endl;
+    std::cout<<"\nIn a world full of monsters and magic, emperors and slaves, thieves and bandits, only the rich or cunning survive.\nYour dishonorable ways have brought you here: the depths of a dungeon."<<std::endl;
+    std::cout<<"Such is the punishment for scoundrels like yourself.\nYour only chance of escape is your wit and a magic crystal, acquired through deceitful means.\nGood luck...\nyou'll need it..."<<std::endl;
+    EnterToContinue();
+}
+void HowToPlay()
+{
+    std::cout<<std::endl;
+    std::cout<<"Would you like to view the How To Play section?\nPress y to proceed or c to cancel and skip it : ";
+    AskInput();
+    switch(cinput)
+    {
+    case 'y':
+        clearScreen();
+        std::cout<<R"(Scoundrel is a single-player dungeon crawl. You will enter rooms which contain 4 random cards drawn from a deck.
+You will have to face cards one by one. You will choose the order in which you will face the cards of each room.
+You must face 3 cards in a room in order to move to the next, at which point the 4th card will carry over and 3 new cards will be drawn to fill the empty spaces.
+Once you face a cards it is thrown in the discard pile.
+--Suits--
+Each suit represents a different kind of entity.
+Spades and Clubs are monsters that you must defeat.
+Hearts are potions that heal your wounds.
+Diamonds are weapons to aid you in battle.
+You defeat monsters by fighting them either with your fists or with a weapon you have equipped.
+You will take damage equal to the power of the monster, 2 being the weakest and ACE being the strongest.
+Healing potions heal your HP up to a maximum of 20, so use them wisely.
+--Gameplay--
+Your Goal is to slay all 26 monsters within the dungeon to guarantee your escape while making sure your HP doesn't drop to 0.
+You start the game with 20 life points (HP) and no weapon.
+If your HP drops to 0, you die and it's Game Over.
+You can also use your Teleport Spell which takes all 4 cards dealt in your current room and placing at the end of the dungeon.
+You will face these cards after your clear all rooms remaining in your run.
+Be Careful! You can use your Teleport Spell as many times as you would like but only upon entering a new room and never twice in a row.
+That means once you pick a card in a room and face it, you must clear the room to enter a new one before you can use Teleport again.
+Also once you use your Teleport Spell, you must clear the next room before being able to use it one more time.
+--Weapons--
+Facing a weapon cards you can choose to equip it or leave it on the ground and skip it.
+Once you equip a weapon, you can not throw it away. It stays equipped until you equip a new one.
+While having one equipped you can choose to fight a monster with it or simply use your fists but the weapon stays equipped.
+If you decide to use your weapon for that fight, you defeat the monster but take less damage based on the power of the weapon.
+For example using a 6 of Diamonds to slay a 9 of Spades means that you defeat the monster and only take 3 damage, otherwise defeating that monster with your fists would make it deal 9 damage.
+Monsters slain by your weapon, curse it with their soul. A cursed weapon can be used to slay only lower-power monsters from that point on. Your 6 of Diamonds in the previous example can only slay 8 power or less monsters moving forward.
+Equipping a new weapon discards your previous one and all the curses afflicted to it. Take note that slaying a monster with your fists while having a weapon equipped does NOT put a curse from that monster on your weapon.
+)"<<std::endl;
+        std::cout<<"\nWould you like to see a brief description of each available game mode ?\nPress y to proceed or c to cancel and skip it : ";
+        AskInput();
+        switch(cinput)
+        {
+        case 'y':
+            ExpansionRules();
+            break;
+        default :
+            break;
+        }
+        break;
+    case 'c':
+        return;
+    case 'q':
+        Quit();
+        return;
+    default:
+        std::cout<<"failed to pick a correct response. Skipping...";
+        return;
+    }
+    EnterToContinue();
+}
+void ExpansionRules()
+{
+    std::cout<<std::endl;
+    std::cout<<R"(--Game Modes--
+-Base-
+The Base Game Mode includes all Spades and Clubs but only numbered Hearts and Diamonds, so it excludes : Jokers, Hearts and Diamonds face cards, Hearts and Diamonds ACES.
+If you are looking for a challenge or simply want to play the game closer to what the original game feels like choose this mode.
+-Healing Fairies-
+The Healing Fairies Expansion includes the Hearts face cards and ACE.
+These cards represent magical fairies that you encounter in the dungeon and can heal you based on the number of monsters you have slain with your current weapon.
+The ACE card is an all powerful fairy that heals you back to full HP regardless of weapon.
+-Forging Fairies-
+The Forging Fairies Expansion includes the Diamonds face cards and ACE.
+These cards represent magical fairies that remove curses from your used weapon allowing you to fight powerful monsters previously impossible.
+The ACE card is an all powerful fairy that completely removes all curses from your current weapon restoring it to its original state.
+-Full-
+The Full Game Mode includes the Base Game and all Expansions available.
+If you are looking for a more complete experience or simply find the Base Game a bit too difficult choose this mode.
+)"<<std::endl;
+}
+void Guide()
+{
+    std::cout<<"Spades and Clubs are monsters that deal damage when fought\n2 through 10 deal equivalent to the card's number\nJack deals 11, Queen deals 12, King deals 13, ACE deals 14"<<std::endl;
+    std::cout<<"Hearts are heals\n2 through 10 heal equivalent to the card's number\nJack,Queen,King heal based on this formula (x*number of monsters slain with current weapon) where x is 1,2,3 respectively in each case\nACE heals for 20"<<std::endl;
+    std::cout<<"Diamonds are weapons or cleanse your weapon\n2 through 10 are weapons that can be equipped and later used to fight monsters, subtracting from the damage of the monster equal to each card's number\nJack through ACE remove number of monsters slain by your weapon from last slain monster up to reaching a clean state.\nJack removes 1, Queen removes 2, King removes 3 and ACE removes all, essentially renewing your weapon"<<std::endl;
+    EnterToContinue();
+}
+void ListControls()
+{
+    std::cout<<"Here are the game's controls\ntake note that some controls might be temporarily used differently throughout the game if stated as such during certain parts"<<std::endl;
+    std::cout<<"y = accept\nc = cancel\n1 trough 4 = pick a card out of the presented selection\nt = use teleport spell\nq = quit the game\nh = show help with controls(this list)\ng = show help with card values\nn = skip weapon\nf = use fists to fight\nr = show rules and how to play"<<std::endl;
+    EnterToContinue();
 }
 // --------- BELOW THIS LINE ARE THE CONTROLS-------------------
 /*
