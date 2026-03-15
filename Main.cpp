@@ -10,23 +10,18 @@
 #include <limits>
 #include <deque>
 /*
-version 0.9.0
 Original Game Rules by Zach Gage and Kurt Bieg (2011)
 -------------------------------------------------------------
 method and variable explanation exists mostly in header files
 -------------------------------------------------------------
-Current version creates a deck of 52 playing cards. Creates a player with 20 hp, a room with 4 spots and can manipulate player's hp and deal new cards in room
+Card class creates a card with a suit and a rank
+Deck class creates a 52 card deck with a single copy of each card. drawing from it doesn't change the deck but accounts for drawing duplicates
+Game class creates a player with 20 hp and a weapon slot, a deck, a room with 4 spots
+Main handles logic behind choosing cards, fighting monsters, healing, keeping score etc.
 
-TODO
-documentation
-
-visibility on number of kills on a weapon
-define controls(check comment at bottom)
-add restart game--debatable--
-add prologue to game
-add how to play section, could be shown or skipped
-add guide of card values
-
+wishlist
+view number of monsters slain on a weapon
+classic mode with original rules (no skipping weapons, no healing twice or more in 1 room)
 */
 //--------------BELOW THIS LINE IS THE DECLARATION OF VARIABLES--------------------
 /*
@@ -313,7 +308,14 @@ void InputCheck(Game& play)
 void ExpansionCheck(Game& play)
 {
     clearScreen();
-    std::cout<<"Before proceeding you should choose a game mode.\nType 1 to select the Base Game mode with only the basic cards and rules\nType 2 to add the Healing Fairies expansion to the base game\nType 3 to add the Forging Fairies expansion to the base game\nType 4 to add all expansions to the base game and play the Full Game mode\nIf you want to see each expansion press h\nYour choice : ";
+    std::cout<<R"(Before proceeding you should choose a game mode.
+    Type 1 to select the Base Game mode with only the basic cards and rules
+    Type 2 to add the Healing Fairies expansion to the base game
+    Type 3 to add the Forging Fairies expansion to the base game
+    Type 4 to add all expansions to the base game and play the Full Game mode
+
+    If you want to see a description of the expansions press h
+    Your choice : )";
     AskInput();
     switch(cinput)
     {
@@ -727,7 +729,7 @@ void Intro()
     clearScreen();
     std::cout<<"Scoundrel\nA solitaire dungeon crawl game\nBased on the original game by Zach Gage and Kurt Bieg"<<std::endl;
     std::cout<<"\nIn a world full of monsters and magic, emperors and slaves, thieves and bandits, only the rich or cunning survive.\nYour dishonorable ways have brought you here: the depths of a dungeon."<<std::endl;
-    std::cout<<"Such is the punishment for scoundrels like yourself.\nYour only chance of escape is your wit and a magic crystal, acquired through deceitful means.\nGood luck...\nyou'll need it..."<<std::endl;
+    std::cout<<"Such is the punishment for scoundrels like yourself.\nYour only chance of escape is your wit and a magical crystal, acquired through deceitful means.\nGood luck...\nyou'll need it..."<<std::endl;
     EnterToContinue();
 }
 void HowToPlay()
@@ -740,10 +742,12 @@ void HowToPlay()
     case 'y':
         clearScreen();
         std::cout<<R"(Scoundrel is a single-player dungeon crawl. You will enter rooms which contain 4 random cards drawn from a deck.
-You will have to face cards one by one. You will choose the order in which you will face the cards of each room.
+You will have to face cards one by one. You will choose the order in which you face the cards of each room.
 You must face 3 cards in a room in order to move to the next, at which point the 4th card will carry over and 3 new cards will be drawn to fill the empty spaces.
 Once you face a cards it is thrown in the discard pile.
+
 --Suits--
+
 Each suit represents a different kind of entity.
 Spades and Clubs are monsters that you must defeat.
 Hearts are potions that heal your wounds.
@@ -751,21 +755,25 @@ Diamonds are weapons to aid you in battle.
 You defeat monsters by fighting them either with your fists or with a weapon you have equipped.
 You will take damage equal to the power of the monster, 2 being the weakest and ACE being the strongest.
 Healing potions heal your HP up to a maximum of 20, so use them wisely.
+
 --Gameplay--
+
 Your Goal is to slay all 26 monsters within the dungeon to guarantee your escape while making sure your HP doesn't drop to 0.
 You start the game with 20 life points (HP) and no weapon.
 If your HP drops to 0, you die and it's Game Over.
 You can also use your Teleport Spell which takes all 4 cards dealt in your current room and placing at the end of the dungeon.
-You will face these cards after your clear all rooms remaining in your run.
-Be Careful! You can use your Teleport Spell as many times as you would like but only upon entering a new room and never twice in a row.
-That means once you pick a card in a room and face it, you must clear the room to enter a new one before you can use Teleport again.
-Also once you use your Teleport Spell, you must clear the next room before being able to use it one more time.
+You will face these cards at the end of the dungeon. They do not get discarded when you use Teleport.
+Attention! You can use your Teleport Spell as many times as you would like but only upon entering a new room and never twice in a row.
+That means if you choose to not use Teleport upon entering a room, you have to commit to clearing 3 cards and enter a new room.
+Also once you use your Teleport Spell, you must clear the next room before being able to use it again.
+
 --Weapons--
-Facing a weapon cards you can choose to equip it or leave it on the ground and skip it.
+
+When facing a weapon card you can choose to equip it or leave it on the ground and skip it.
 Once you equip a weapon, you can not throw it away. It stays equipped until you equip a new one.
 While having one equipped you can choose to fight a monster with it or simply use your fists but the weapon stays equipped.
-If you decide to use your weapon for that fight, you defeat the monster but take less damage based on the power of the weapon.
-For example using a 6 of Diamonds to slay a 9 of Spades means that you defeat the monster and only take 3 damage, otherwise defeating that monster with your fists would make it deal 9 damage.
+If you decide to use your weapon for that fight, you defeat the monster and take less damage based on the power of the weapon.
+For example using a 6 of Diamonds to slay a 9 of Spades means you defeat the monster and only take 3 damage, otherwise defeating that monster with your fists would make it deal 9 damage.
 Monsters slain by your weapon, curse it with their soul. A cursed weapon can be used to slay only lower-power monsters from that point on. Your 6 of Diamonds in the previous example can only slay 8 power or less monsters moving forward.
 Equipping a new weapon discards your previous one and all the curses afflicted to it. Take note that slaying a monster with your fists while having a weapon equipped does NOT put a curse from that monster on your weapon.
 )"<<std::endl;
@@ -795,18 +803,26 @@ void ExpansionRules()
 {
     std::cout<<std::endl;
     std::cout<<R"(--Game Modes--
+
 -Base-
+
 The Base Game Mode includes all Spades and Clubs but only numbered Hearts and Diamonds, so it excludes : Jokers, Hearts and Diamonds face cards, Hearts and Diamonds ACES.
 If you are looking for a challenge or simply want to play the game closer to what the original game feels like choose this mode.
+
 -Healing Fairies-
+
 The Healing Fairies Expansion includes the Hearts face cards and ACE.
 These cards represent magical fairies that you encounter in the dungeon and can heal you based on the number of monsters you have slain with your current weapon.
 The ACE card is an all powerful fairy that heals you back to full HP regardless of weapon.
+
 -Forging Fairies-
+
 The Forging Fairies Expansion includes the Diamonds face cards and ACE.
 These cards represent magical fairies that remove curses from your used weapon allowing you to fight powerful monsters previously impossible.
 The ACE card is an all powerful fairy that completely removes all curses from your current weapon restoring it to its original state.
+
 -Full-
+
 The Full Game Mode includes the Base Game and all Expansions available.
 If you are looking for a more complete experience or simply find the Base Game a bit too difficult choose this mode.
 )"<<std::endl;
